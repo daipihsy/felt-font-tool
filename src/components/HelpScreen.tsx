@@ -25,6 +25,11 @@ export function HelpScreen({ onBack }: HelpScreenProps) {
             <li>确认后下载或分享高清图片</li>
           </ol>
 
+          <h2>不导入图片，直接预览字体</h2>
+          <div className="card">
+            在首页点击“白底排字（免导入图片）”，选择画布比例，即可在纯白背景上输入名字、切换字体预览效果，并直接下载成图片。
+          </div>
+
           <h2>导入字体</h2>
           <div className="card">
             打开“字体管理”，点击“导入字体”，选择手机中的 TTF 或 OTF

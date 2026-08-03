@@ -20,7 +20,11 @@ import {
   setDefaultFont,
   FontImportError,
 } from './services/fontService'
-import { decodeForEditing, isSupportedImageType } from './services/imageService'
+import {
+  decodeForEditing,
+  isSupportedImageType,
+  createBlankImageBlob,
+} from './services/imageService'
 import { exportPng, ExportError } from './services/imageExportService'
 import { shareOrDownload, downloadBlob } from './services/shareService'
 import {
@@ -47,7 +51,16 @@ interface EditorImage {
 type DialogState =
   | { type: 'deleteFont'; id: string; name: string }
   | { type: 'clearDraft' }
+  | { type: 'blankCanvas' }
   | null
+
+// White-background presets (long side 1500px).
+const BLANK_PRESETS: { label: string; width: number; height: number }[] = [
+  { label: '正方形 1:1', width: 1500, height: 1500 },
+  { label: '竖版 4:5', width: 1200, height: 1500 },
+  { label: '竖版 3:4', width: 1125, height: 1500 },
+  { label: '横版 4:3', width: 1500, height: 1125 },
+]
 
 export default function App() {
   const [screen, setScreen] = useState<ScreenName>('home')
@@ -169,6 +182,33 @@ export default function App() {
       setScreen('editor')
     } catch (err) {
       showToast(err instanceof Error ? err.message : '图片导入失败')
+    }
+  }
+
+  // ---- Blank white-background canvas (no photo needed) ----
+  const startBlankCanvas = async (width: number, height: number) => {
+    try {
+      const blob = await createBlankImageBlob(width, height, '#ffffff')
+      const decoded = await decodeForEditing(blob)
+      imageRef.current?.preview.close?.()
+      setImage({
+        blob,
+        preview: decoded.preview,
+        width: decoded.width,
+        height: decoded.height,
+        fileName: '白底.png',
+      })
+      // Prefill a sample so the chosen font is visible immediately.
+      setOverlay({ ...DEFAULT_OVERLAY, fontId: defaultFontId, text: 'Charlie' })
+      try {
+        await saveDraftImage(blob)
+      } catch {
+        /* storage may be full; editing still works this session */
+      }
+      setHasDraft(true)
+      setScreen('editor')
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : '创建白底失败')
     }
   }
 
@@ -340,6 +380,7 @@ export default function App() {
           hasDraft={hasDraft}
           canInstall={canInstall}
           onImport={() => openPicker('new')}
+          onBlankCanvas={() => setDialog({ type: 'blankCanvas' })}
           onContinue={continueDraft}
           onFonts={() => setScreen('fonts')}
           onHelp={() => setScreen('help')}
@@ -419,6 +460,33 @@ export default function App() {
           }}
           onCancel={() => setDialog(null)}
         />
+      )}
+      {dialog?.type === 'blankCanvas' && (
+        <div className="dialog-backdrop" onClick={() => setDialog(null)}>
+          <div className="dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="dialog-title">选择白底比例</div>
+            <div className="dialog-message">先选一个画布比例，再输入名字预览字体。</div>
+            <div className="list" style={{ marginTop: 0 }}>
+              {BLANK_PRESETS.map((p) => (
+                <button
+                  key={p.label}
+                  className="btn btn-block"
+                  onClick={() => {
+                    setDialog(null)
+                    void startBlankCanvas(p.width, p.height)
+                  }}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <div className="dialog-actions">
+              <button className="btn" onClick={() => setDialog(null)}>
+                取消
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       {dialog?.type === 'clearDraft' && (
         <ConfirmDialog

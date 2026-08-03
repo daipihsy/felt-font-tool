@@ -2,6 +2,7 @@ interface HomeScreenProps {
   hasDraft: boolean
   canInstall: boolean
   onImport: () => void
+  onBlankCanvas: () => void
   onContinue: () => void
   onFonts: () => void
   onHelp: () => void
@@ -14,6 +15,7 @@ export function HomeScreen({
   hasDraft,
   canInstall,
   onImport,
+  onBlankCanvas,
   onContinue,
   onFonts,
   onHelp,
@@ -31,6 +33,10 @@ export function HomeScreen({
       <div className="home-actions">
         <button className="btn btn-primary btn-lg btn-block" onClick={onImport}>
           导入产品图片
+        </button>
+
+        <button className="btn btn-lg btn-block" onClick={onBlankCanvas}>
+          白底排字（免导入图片）
         </button>
 
         {hasDraft && (

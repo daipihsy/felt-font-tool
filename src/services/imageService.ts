@@ -91,6 +91,32 @@ function decodeViaImgElement(source: Blob): Promise<ImageBitmap> {
   })
 }
 
+/**
+ * Create a solid-color (default white) PNG blob to use as a blank background,
+ * so the user can preview fonts without importing a photo. It feeds into the
+ * exact same editor + export pipeline as an imported image.
+ */
+export async function createBlankImageBlob(
+  width: number,
+  height: number,
+  color = '#ffffff'
+): Promise<Blob> {
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('无法创建画布，当前浏览器可能内存不足')
+  ctx.fillStyle = color
+  ctx.fillRect(0, 0, width, height)
+  const blob = await new Promise<Blob | null>((resolve) =>
+    canvas.toBlob((b) => resolve(b), 'image/png')
+  )
+  canvas.width = 0
+  canvas.height = 0
+  if (!blob) throw new Error('无法生成白底图片，请重试')
+  return blob
+}
+
 const SUPPORTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 export function isSupportedImageType(type: string): boolean {
