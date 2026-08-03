@@ -31,7 +31,8 @@ export const DEFAULT_OVERLAY: TextOverlayState = {
   text: '',
   fontId: BUILTIN_FONT_ID,
   color: '#000000',
-  letterSpacing: 0,
+  // Default the letter spacing to the minimum (slider at far left).
+  letterSpacing: MIN_LETTER_SPACING,
   centerXRatio: 0.5,
   centerYRatio: 0.5,
   fontSizeRatio: DEFAULT_SIZE_RATIO,
