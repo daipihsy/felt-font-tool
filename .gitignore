@@ -7,3 +7,4 @@ dist-ssr
 coverage
 *.log
 node_modules/.tmp
+.github/workflows/deploy-pages.yml
