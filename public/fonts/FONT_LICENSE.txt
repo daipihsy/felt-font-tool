@@ -1,0 +1,15 @@
+内置字体 / Bundled font
+=======================
+
+文件 / File: PlaywriteNZGuides-Regular.ttf
+显示名称 / Display name: Playwrite NZ Guides
+
+本项目随附上述字体文件作为默认内置字体。项目目录中未附带该字体的原始许可证文件。
+
+请在正式公开发布前，确认所有内置及导入字体的授权范围，并在此处补充字体的原始许可证
+（例如 SIL Open Font License 全文或作者提供的授权说明）。
+
+This project bundles the font above as the default built-in font. No original
+license file for this font was provided in the project directory. Before any
+public release, confirm the licensing terms of all bundled and imported fonts
+and add the original license text here.
