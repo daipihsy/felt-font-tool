@@ -14,7 +14,7 @@
 - 添加名字并实时预览（支持中文、英文、数字、空格、常见符号）
 - 单指拖动文字位置，双指缩放文字大小，滑块微调
 - 文字颜色、字间距调节
-- 内置字体 **Playwrite NZ Guides**，首次打开即可使用
+- 内置字体 **Playwrite NZ Guides**、**Intro**，首次打开即可使用
 - 字体管理：导入 TTF / OTF、预览、改名、设为默认、删除（内置字体不可删除）
 - 全屏预览（隐藏所有编辑控件）
 - 导出**原图分辨率**的高清 PNG（基于原图用 Canvas 重绘，不是屏幕截图）
@@ -102,17 +102,18 @@ npm run preview
 内置字体文件位于：
 
 ```text
-public/fonts/PlaywriteNZGuides-Regular.ttf
+public/fonts/PlaywriteNZGuides-Regular.ttf   显示名称 Playwrite NZ Guides（默认/兜底字体）
+public/fonts/Intro.ttf                       显示名称 Intro
 ```
 
-显示名称为 **Playwrite NZ Guides**，通过 `FontFace` API 在应用启动时加载，用户首次打开即可使用，离线也可用，且不可在应用内删除。
+内置字体通过 `FontFace` API 在应用启动时加载，用户首次打开即可使用，离线也可用，且不可在应用内删除。
 
 字体许可说明见 `public/fonts/FONT_LICENSE.txt`。**请在正式公开发布前确认所有内置及导入字体的授权范围。**
 
 ### 增加新的内置字体
 
 1. 将字体文件放入 `public/fonts/`。
-2. 目前内置字体在 `src/utils/constants.ts` 中通过 `BUILTIN_FONT_*` 常量注册。如需再增加一个内置字体，可在字体服务 `src/services/fontService.ts` 的 `initFonts()` 中按同样方式再注册一个 `FontFace`（提供显示名称与 family 名）。
+2. 在 `src/utils/constants.ts` 的 `BUILTIN_FONTS` 数组中追加一项（id、family、显示名称、文件路径），并在 `vite.config.ts` 的 `includeAssets` 中加入该文件。
 3. 重新构建并部署。
 
 ### 手机端导入字体（无需更新网站）
@@ -125,6 +126,7 @@ public/fonts/PlaywriteNZGuides-Regular.ttf
 felt-font-tool/
 ├─ public/
 │  ├─ fonts/PlaywriteNZGuides-Regular.ttf   内置字体
+│  ├─ fonts/Intro.ttf                        内置字体
 │  ├─ icons/                                 PWA 图标（脚本生成）
 │  ├─ favicon.svg
 │  └─ apple-touch-icon.png

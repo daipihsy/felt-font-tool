@@ -5,6 +5,36 @@ export const BUILTIN_FONT_FAMILY = 'PlaywriteNZGuides'
 export const BUILTIN_FONT_DISPLAY_NAME = 'Playwrite NZ Guides'
 export const BUILTIN_FONT_URL = 'fonts/PlaywriteNZGuides-Regular.ttf'
 
+export interface BuiltinFontDef {
+  id: string
+  family: string
+  displayName: string
+  url: string
+  fileName: string
+  /** localStorage key that keeps the user's custom display name. */
+  nameKey: string
+}
+
+/** Built-in fonts, in display order. The first one is the fallback font. */
+export const BUILTIN_FONTS: BuiltinFontDef[] = [
+  {
+    id: BUILTIN_FONT_ID,
+    family: BUILTIN_FONT_FAMILY,
+    displayName: BUILTIN_FONT_DISPLAY_NAME,
+    url: BUILTIN_FONT_URL,
+    fileName: 'PlaywriteNZGuides-Regular.ttf',
+    nameKey: 'builtinFontName',
+  },
+  {
+    id: 'intro',
+    family: 'IntroBuiltin',
+    displayName: 'Intro',
+    url: 'fonts/Intro.ttf',
+    fileName: 'Intro.ttf',
+    nameKey: 'builtinFontName_intro',
+  },
+]
+
 // Text size expressed as a ratio of the image's shorter side.
 export const MIN_SIZE_RATIO = 0.02
 export const MAX_SIZE_RATIO = 0.5

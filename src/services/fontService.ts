@@ -1,10 +1,5 @@
 import type { FontMeta, StoredFont } from '../types'
-import {
-  BUILTIN_FONT_ID,
-  BUILTIN_FONT_FAMILY,
-  BUILTIN_FONT_DISPLAY_NAME,
-  BUILTIN_FONT_URL,
-} from '../utils/constants'
+import { BUILTIN_FONT_ID, BUILTIN_FONT_FAMILY, BUILTIN_FONTS } from '../utils/constants'
 import {
   hasSupportedExtension,
   isSizeInRange,
@@ -19,8 +14,6 @@ import {
   getDefaultFontId,
   setDefaultFontIdInDb,
 } from './indexedDbService'
-
-const BUILTIN_NAME_KEY = 'builtinFontName'
 
 interface RegistryEntry {
   meta: FontMeta
@@ -40,8 +33,13 @@ export function listFonts(): FontMeta[] {
     .map((e) => e.meta)
     .sort((a, b) => {
       if (a.isBuiltIn !== b.isBuiltIn) return a.isBuiltIn ? -1 : 1
+      if (a.isBuiltIn) return builtinIndex(a.id) - builtinIndex(b.id)
       return a.createdAt - b.createdAt
     })
+}
+
+function builtinIndex(id: string): number {
+  return BUILTIN_FONTS.findIndex((d) => d.id === id)
 }
 
 function assetUrl(path: string): string {
@@ -55,30 +53,32 @@ export interface InitResult {
   failedIds: string[]
 }
 
-/** Register the built-in font and every imported font from IndexedDB. */
+/** Register the built-in fonts and every imported font from IndexedDB. */
 export async function initFonts(): Promise<InitResult> {
   registry.clear()
 
-  // Built-in font.
-  const builtinName =
-    safeLocalGet(BUILTIN_NAME_KEY) || BUILTIN_FONT_DISPLAY_NAME
-  const builtinMeta: FontMeta = {
-    id: BUILTIN_FONT_ID,
-    displayName: builtinName,
-    originalFileName: 'PlaywriteNZGuides-Regular.ttf',
-    familyName: BUILTIN_FONT_FAMILY,
-    isBuiltIn: true,
-    createdAt: 0,
-  }
-  try {
-    const face = new FontFace(BUILTIN_FONT_FAMILY, `url("${assetUrl(BUILTIN_FONT_URL)}")`)
-    await face.load()
-    document.fonts.add(face)
-    registry.set(BUILTIN_FONT_ID, { meta: builtinMeta, family: BUILTIN_FONT_FAMILY, face })
-  } catch {
-    // Even if the network/file failed, keep the metadata so the app still runs.
-    registry.set(BUILTIN_FONT_ID, { meta: builtinMeta, family: BUILTIN_FONT_FAMILY })
-  }
+  // Built-in fonts.
+  await Promise.all(
+    BUILTIN_FONTS.map(async (def) => {
+      const meta: FontMeta = {
+        id: def.id,
+        displayName: safeLocalGet(def.nameKey) || def.displayName,
+        originalFileName: def.fileName,
+        familyName: def.family,
+        isBuiltIn: true,
+        createdAt: 0,
+      }
+      try {
+        const face = new FontFace(def.family, `url("${assetUrl(def.url)}")`)
+        await face.load()
+        document.fonts.add(face)
+        registry.set(def.id, { meta, family: def.family, face })
+      } catch {
+        // Even if the network/file failed, keep the metadata so the app still runs.
+        registry.set(def.id, { meta, family: def.family })
+      }
+    }),
+  )
 
   // Imported fonts.
   const failedIds: string[] = []
@@ -203,7 +203,8 @@ export async function renameFont(id: string, displayName: string): Promise<void>
   registry.set(id, entry)
 
   if (entry.meta.isBuiltIn) {
-    safeLocalSet(BUILTIN_NAME_KEY, name)
+    const def = BUILTIN_FONTS.find((d) => d.id === id)
+    if (def) safeLocalSet(def.nameKey, name)
     return
   }
   try {

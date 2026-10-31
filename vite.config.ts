@@ -19,6 +19,7 @@ export default defineConfig({
       includeAssets: [
         'favicon.svg',
         'fonts/PlaywriteNZGuides-Regular.ttf',
+        'fonts/Intro.ttf',
         'apple-touch-icon.png',
       ],
       manifest: {

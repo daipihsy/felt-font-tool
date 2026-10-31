@@ -32,7 +32,7 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
           <h2>字体许可</h2>
           <div className="card">
             <p>
-              内置字体：Playwrite NZ Guides（文件：PlaywriteNZGuides-Regular.ttf）。
+              内置字体：Playwrite NZ Guides（文件：PlaywriteNZGuides-Regular.ttf）、Intro（文件：Intro.ttf）。
             </p>
             <p>请在正式公开发布前确认所有内置及导入字体的授权范围。</p>
           </div>
