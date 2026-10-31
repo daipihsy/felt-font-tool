@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { FontMeta, ScreenName, TextOverlayState } from './types'
-import { DEFAULT_OVERLAY, BUILTIN_FONT_ID } from './utils/constants'
+import { DEFAULT_OVERLAY, BUILTIN_FONT_ID, defaultLetterSpacingFor } from './utils/constants'
 import { HomeScreen } from './components/HomeScreen'
 import { EditorScreen } from './components/EditorScreen'
 import { FullscreenPreview } from './components/FullscreenPreview'
@@ -97,7 +97,11 @@ export default function App() {
         setFonts(res.fonts)
         setDefaultFontId(res.defaultFontId)
         setFailedIds(res.failedIds)
-        setOverlay((o) => ({ ...o, fontId: res.defaultFontId }))
+        setOverlay((o) => ({
+          ...o,
+          fontId: res.defaultFontId,
+          letterSpacing: defaultLetterSpacingFor(res.defaultFontId),
+        }))
       } catch {
         /* fonts failed; app still runs with fallbacks */
       }
@@ -171,7 +175,11 @@ export default function App() {
       }
       setImage(next)
       if (importModeRef.current === 'new') {
-        setOverlay({ ...DEFAULT_OVERLAY, fontId: defaultFontId })
+        setOverlay({
+          ...DEFAULT_OVERLAY,
+          fontId: defaultFontId,
+          letterSpacing: defaultLetterSpacingFor(defaultFontId),
+        })
       }
       try {
         await saveDraftImage(file)
@@ -199,7 +207,12 @@ export default function App() {
         fileName: '白底.png',
       })
       // Prefill a sample so the chosen font is visible immediately.
-      setOverlay({ ...DEFAULT_OVERLAY, fontId: defaultFontId, text: 'Charlie' })
+      setOverlay({
+        ...DEFAULT_OVERLAY,
+        fontId: defaultFontId,
+        letterSpacing: defaultLetterSpacingFor(defaultFontId),
+        text: 'Charlie',
+      })
       try {
         await saveDraftImage(blob)
       } catch {
@@ -288,7 +301,7 @@ export default function App() {
       centerXRatio: 0.5,
       centerYRatio: 0.5,
       fontSizeRatio: DEFAULT_OVERLAY.fontSizeRatio,
-      letterSpacing: DEFAULT_OVERLAY.letterSpacing,
+      letterSpacing: defaultLetterSpacingFor(overlay.fontId),
     })
   const clearText = () => patchOverlay({ text: '' })
 

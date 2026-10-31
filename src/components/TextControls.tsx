@@ -4,6 +4,7 @@ import {
   SLIDER_MIN,
   SLIDER_MAX,
   MIN_LETTER_SPACING,
+  defaultLetterSpacingFor,
   MAX_LETTER_SPACING,
 } from '../utils/constants'
 import { clampSizeRatio } from '../utils/coordinates'
@@ -70,7 +71,12 @@ export function TextControls({
           id="font-select"
           className="text-input"
           value={overlay.fontId}
-          onChange={(e) => onChange({ fontId: e.target.value })}
+          onChange={(e) =>
+            onChange({
+              fontId: e.target.value,
+              letterSpacing: defaultLetterSpacingFor(e.target.value),
+            })
+          }
         >
           {fonts.map((f) => (
             <option key={f.id} value={f.id}>

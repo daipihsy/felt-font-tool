@@ -13,6 +13,8 @@ export interface BuiltinFontDef {
   fileName: string
   /** localStorage key that keeps the user's custom display name. */
   nameKey: string
+  /** Letter spacing applied when this font is picked; defaults to the minimum. */
+  defaultLetterSpacing?: number
 }
 
 /** Built-in fonts, in display order. The first one is the fallback font. */
@@ -32,6 +34,7 @@ export const BUILTIN_FONTS: BuiltinFontDef[] = [
     url: 'fonts/Intro.ttf',
     fileName: 'Intro.ttf',
     nameKey: 'builtinFontName_intro',
+    defaultLetterSpacing: 0.04,
   },
 ]
 
@@ -56,6 +59,13 @@ export const EXPORT_MAX_DIMENSION = 8192
 export const MAX_FONT_BYTES = 30 * 1024 * 1024 // 30 MB
 
 export const THEME_COLOR = '#F5F1E8'
+
+/** Default letter spacing for a font (imported fonts use the global default). */
+export function defaultLetterSpacingFor(fontId: string): number {
+  return (
+    BUILTIN_FONTS.find((d) => d.id === fontId)?.defaultLetterSpacing ?? MIN_LETTER_SPACING
+  )
+}
 
 export const DEFAULT_OVERLAY: TextOverlayState = {
   text: '',
